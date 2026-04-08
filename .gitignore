@@ -1,0 +1,59 @@
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+*.pkl
+*.npy
+*.csv
+*.xlsx
+!Реестр*.xlsx
+
+# ML artifacts
+catboost_info/
+*.log
+
+# Next.js (keep these files)
+!service/package.json
+!service/package-lock.json
+!service/components.json
+!service/tsconfig.json
+service/node_modules/
+service/.next/
+service/out/
+service/uploads/
+service/exports/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Temporary files
+test*.py
+test*.js
+check*.py
+*.json
+!results*.json
+embeddings.npy
+*.npy
+*.pkl
+model_*.pkl

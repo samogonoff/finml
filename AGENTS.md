@@ -1,0 +1,141 @@
+# FinML Agent Instructions
+
+## Project Overview
+
+ML service for predicting PL and CFO codes from payment text data. Target "Код" split into:
+- **PL**: last 2 characters of code
+- **CFO**: all characters except last 2
+
+## Project Structure
+
+```
+/mnt/d/FinML/           # Root project (Windows path: D:\FinML\)
+├── service/             # Next.js frontend service
+│   ├── app/            # Pages and API routes
+│   ├── components/      # UI components
+│   ├── lib/             # Utilities
+│   └── uploads/         # Uploaded files
+├── model_final.pkl      # Best model bundle (MLP for PL + XGBoost for CFO)
+├── embeddings.npy       # Pre-computed BERT embeddings (384 features)
+├── data.pkl             # Training data from SQL
+├── predict_excel_api.py # Python API script for predictions
+├── train_final.py       # Final model training script
+├── requirements.txt     # Python dependencies
+└── AGENTS.md           # This file
+```
+
+## Developer Commands
+
+### Start Next.js Service (Windows)
+
+```bash
+cd D:\FinML\service
+npm run dev
+```
+
+Then open http://localhost:3000
+
+### Start Next.js Service (WSL)
+
+```bash
+cd /mnt/d/FinML/service
+(npm run dev &)
+```
+
+Note: Use subshell `(npm run dev &)` for background process - without it the process dies.
+
+### Train Models
+
+```bash
+cd D:\FinML
+D:\FinML\.venv\Scripts\activate
+python train_final.py
+```
+
+### Run Prediction Script Directly
+
+```bash
+cd D:\FinML
+D:\FinML\.venv\Scripts\activate
+python predict_excel_api.py "path/to/file.xlsx"
+```
+
+### Install Dependencies
+
+```bash
+# Python (Windows)
+D:\FinML\.venv\Scripts\activate
+pip install -r requirements.txt
+
+# Install PyTorch with CUDA
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
+```
+
+```bash
+# Node.js (service)
+cd D:\FinML\service
+npm install
+```
+
+## Architecture Notes
+
+1. **ML Model**: Python-based, loaded from `model_final.pkl`
+2. **Frontend**: Next.js 16 with Turbopack
+3. **Prediction Flow**: 
+   - Excel → Next.js API → Python script → ML model → JSON response
+4. **Embedding Model**: paraphrase-multilingual-MiniLM-L12-v2 (384 dims)
+5. **Best Models**: MLP (PL with date features) + XGBoost (CFO)
+6. **Model Performance**: PL accuracy ~91.5%, CFO accuracy ~61%
+
+## Data Source
+
+- SQL Server: `10.10.6.15`, Database: `FinDWH`, Table: `[FinDWH].[dbo].[AccessRU]`
+- Excel file fields: "Информация", "Код УФ" (if present)
+
+## Key Files
+
+| File | Purpose |
+|------|---------|
+| `model_final.pkl` | Serialized model bundle with MLP + XGBoost |
+| `predict_excel_api.py` | Python script called by Next.js API |
+| `train_final.py` | Script for training final models |
+| `embeddings.npy` | Pre-computed BERT embeddings |
+
+## API Endpoints
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/api/upload` | POST | Upload Excel, return predictions |
+| `/api/save` | POST | Save corrected data to JSON/CSV |
+
+## Code Logic for "Код УФ"
+
+- If "Код УФ" is filled: extract PL (last 2 chars) and CFO (all except last 2)
+- If "Код УФ" is empty: use ML model to predict PL and CFO
+
+## Git Repository
+
+Remote: https://github.com/samogonoff/finml.git
+
+### Large Files (.gitignore)
+
+The following files are excluded from git (too large for GitHub):
+- `embeddings.npy` (102MB) - BERT embeddings
+- `*.pkl`, `model_*.pkl` - Python pickle files
+
+To set up on a new machine:
+```bash
+git clone https://github.com/samogonoff/finml.git
+cd finml
+git remote add python-files samogonoff/finml-python.git  # Separate repo for large files (TODO)
+```
+
+Or download `embeddings.npy` and `model_final.pkl` from the release.
+
+## WSL/Windows Development Notes
+
+- Node.js runs as Windows process (not WSL native)
+- Use `"/mnt/c/Program Files/nodejs/node.exe"` to invoke Node
+- Python venv path: `D:\FinML\.venv\Scripts\python.exe`
+- CUDA auto-detection: script checks `torch.cuda.is_available()`
+- **WSL curl cannot send POST requests to Windows Node.js processes** - use browser instead

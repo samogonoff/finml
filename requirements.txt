@@ -1,0 +1,27 @@
+# Core ML dependencies for FinML
+# Install with: pip install -r requirements.txt
+
+# PyTorch with CUDA 11.8 (for GPU acceleration)
+# Install from PyTorch index for CUDA support:
+# pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
+torch>=2.7.0
+torchvision>=0.22.0
+
+# ML Models
+xgboost>=3.0.0
+scikit-learn>=1.8.0
+sentence-transformers>=5.0.0
+
+# Data processing
+pandas>=3.0.0
+numpy>=2.4.0
+
+# Database (for SQL Server)
+pymssql>=2.2.0
+
+# Excel/CSV
+openpyxl>=3.1.0
+xlrd>=2.0.0
+
+# Environment
+python-dotenv>=1.0.0
