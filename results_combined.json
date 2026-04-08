@@ -1,0 +1,7 @@
+{
+  "model": "MLP+XGBoost",
+  "pl_accuracy": 0.9144515296983593,
+  "cfo_accuracy": 0.60937164147023,
+  "pl_source": "MLP",
+  "cfo_source": "XGBoost"
+}

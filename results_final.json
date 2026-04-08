@@ -1,0 +1,8 @@
+{
+  "model": "MLP(PL+date) + XGBoost(CFO)",
+  "pl_accuracy": 0.9150247187791073,
+  "cfo_accuracy": 0.610374722361539,
+  "pl_time": 25.393863439559937,
+  "cfo_time": 285.6206340789795,
+  "description": "PL: MLP + embeddings + date | CFO: XGBoost + embeddings + PL"
+}

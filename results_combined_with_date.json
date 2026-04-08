@@ -1,0 +1,8 @@
+{
+  "model": "MLP+XGBoost+Date",
+  "pl_accuracy": 0.9150247187791073,
+  "cfo_accuracy": 0.5761983234219388,
+  "pl_time": 26.230515480041504,
+  "cfo_time": 133.08853888511658,
+  "features": "embeddings + date features (\u0433\u043e\u0434, \u043c\u0435\u0441\u044f\u0446, \u0434\u0435\u043d\u044c, \u0434\u0435\u043d\u044c_\u043d\u0435\u0434\u0435\u043b\u0438)"
+}

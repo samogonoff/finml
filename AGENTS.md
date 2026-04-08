@@ -123,19 +123,60 @@ The following files are excluded from git (too large for GitHub):
 - `embeddings.npy` (102MB) - BERT embeddings
 - `*.pkl`, `model_*.pkl` - Python pickle files
 
-To set up on a new machine:
+### Setup on New Machine (Linux/WSL)
+
 ```bash
 git clone https://github.com/samogonoff/finml.git
 cd finml
-git remote add python-files samogonoff/finml-python.git  # Separate repo for large files (TODO)
+
+# 1. Install Python dependencies
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+
+# 2. Install Node.js dependencies
+cd service
+npm install
+cd ..
+
+# 3. Download large files separately
+# Download embeddings.npy and model_final.pkl and place in /mnt/d/FinML/
+
+# 4. Start the service
+cd service
+npm run dev
+# Open http://localhost:3000
 ```
 
-Or download `embeddings.npy` and `model_final.pkl` from the release.
+### Setup on New Machine (Windows)
+
+```cmd
+git clone https://github.com/samogonoff/finml.git
+cd finml
+
+:: 1. Install Python dependencies
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+
+:: 2. Install Node.js dependencies
+cd service
+npm install
+cd ..
+
+:: 3. Download large files separately
+:: Download embeddings.npy and model_final.pkl and place in D:\FinML\
+
+:: 4. Start the service
+cd service
+npm run dev
+:: Open http://localhost:3000
+```
 
 ## WSL/Windows Development Notes
 
 - Node.js runs as Windows process (not WSL native)
 - Use `"/mnt/c/Program Files/nodejs/node.exe"` to invoke Node
-- Python venv path: `D:\FinML\.venv\Scripts\python.exe`
+- Python venv: use `.venv` in project root
 - CUDA auto-detection: script checks `torch.cuda.is_available()`
 - **WSL curl cannot send POST requests to Windows Node.js processes** - use browser instead
