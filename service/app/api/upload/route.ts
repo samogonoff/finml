@@ -53,7 +53,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       const projectDir = path.join(serviceDir, "..")
       const scriptPath = path.join(projectDir, "predict_excel_api.py")
 
-      const python = spawn("D:\\FinML\\.venv\\Scripts\\python.exe", [scriptPath, filepath], {
+      const python = spawn("C:\\Users\\Андрей\\AppData\\Local\\Programs\\Python\\Python314\\python.exe", [scriptPath, filepath], {
         cwd: projectDir,
       })
 
