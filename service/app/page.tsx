@@ -32,10 +32,24 @@ export interface PaymentRecord {
   isModified: boolean
 }
 
+function todayStr() {
+  const d = new Date()
+  return d.toISOString().slice(0, 10)
+}
+
+function monthAgoStr() {
+  const d = new Date()
+  d.setMonth(d.getMonth() - 1)
+  return d.toISOString().slice(0, 10)
+}
+
 export default function FinMLPage() {
   const [records, setRecords] = useState<PaymentRecord[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
+  const [region, setRegion] = useState("RU")
+  const [dateFrom, setDateFrom] = useState(monthAgoStr)
+  const [dateTo, setDateTo] = useState(todayStr)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const hasChanges = useMemo(() => {
@@ -54,7 +68,7 @@ export default function FinMLPage() {
     )
   }, [records, searchQuery])
 
-  const handleLoadData = () => {
+  const handleLoadExcel = () => {
     fileInputRef.current?.click()
   }
 
@@ -116,6 +130,73 @@ export default function FinMLPage() {
     }
   }
 
+  const handleLoadFrom1C = async () => {
+    if (!dateFrom || !dateTo) {
+      toastFn.error("Укажите даты")
+      return
+    }
+    if (dateFrom > dateTo) {
+      toastFn.error("Начальная дата позже конечной")
+      return
+    }
+
+    setIsLoading(true)
+    try {
+      const dateFromStr = dateFrom.replace(/-/g, "")
+      const dateToStr = dateTo.replace(/-/g, "")
+
+      const response = await fetch("/api/fetch-from-1c", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ region, dateFrom: dateFromStr, dateTo: dateToStr }),
+      })
+
+      if (!response.ok) {
+        const err = await response.json()
+        throw new Error(err.error || "Fetch failed")
+      }
+
+      const data = await response.json()
+      
+      const processed: PaymentRecord[] = data.records.map((r: any, idx: number) => ({
+        id: String(idx),
+        num: r.num || "",
+        op_type: r.op_type || "",
+        doc_type: r.doc_type || "",
+        details: r.details || "",
+        date: r.date || "",
+        currency: r.currency || "",
+        amount_doc: r.amount_doc || "",
+        amount_cur: r.amount_cur || "",
+        amount_rub: r.amount_rub || "",
+        info: r.info || "",
+        recipient: r.recipient || "",
+        code_uf: r.code_uf || "",
+        department: r.department || "",
+        debit: r.debit || "",
+        debit2: r.debit2 || "",
+        credit: r.credit || "",
+        credit2: r.credit2 || "",
+        pl: r.pl || "",
+        cfo: r.cfo || "",
+        pl_source: r.pl_source || "predicted",
+        cfo_source: r.cfo_source || "predicted",
+        isModified: r.is_modified || false,
+      }))
+
+      setRecords(processed)
+      toastFn.success("Данные загружены", {
+        description: `Загружено ${processed.length} записей из 1С (${region})`,
+      })
+    } catch (error) {
+      toastFn.error("Ошибка загрузки", {
+        description: String(error),
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const handlePLChange = (id: string, newPL: string) => {
     setRecords((prev) =>
       prev.map((r) =>
@@ -142,8 +223,6 @@ export default function FinMLPage() {
 
       if (!response.ok) throw new Error("Save failed")
 
-      const data = await response.json()
-      
       setRecords((prev) =>
         prev.map((r) => ({ ...r, isModified: false }))
       )
@@ -171,11 +250,18 @@ export default function FinMLPage() {
       <Header
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        onLoadData={handleLoadData}
+        onLoadFrom1C={handleLoadFrom1C}
+        onLoadExcel={handleLoadExcel}
         onSaveData={handleSaveData}
         hasChanges={hasChanges}
         isDataLoaded={records.length > 0}
         isLoading={isLoading}
+        dateFrom={dateFrom}
+        dateTo={dateTo}
+        region={region}
+        onDateFromChange={setDateFrom}
+        onDateToChange={setDateTo}
+        onRegionChange={setRegion}
       />
       
       <main className="container mx-auto px-4 py-6">

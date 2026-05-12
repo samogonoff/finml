@@ -1,28 +1,51 @@
 "use client"
 
-import { Upload, Save, Database, Cpu } from "lucide-react"
+import { Upload, Save, Database, Cpu, FileSpreadsheet } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Search, Loader2 } from "lucide-react"
+import { Search, Loader2, ChevronDown } from "lucide-react"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
+const REGIONS = ["BR", "BY", "RU", "KZ", "UZ", "CN", "TR"] as const
 
 interface HeaderProps {
   searchQuery: string
   onSearchChange: (query: string) => void
-  onLoadData: () => void
+  onLoadFrom1C: () => void
+  onLoadExcel: () => void
   onSaveData: () => void
   hasChanges: boolean
   isDataLoaded: boolean
   isLoading: boolean
+  dateFrom: string
+  dateTo: string
+  region: string
+  onDateFromChange: (date: string) => void
+  onDateToChange: (date: string) => void
+  onRegionChange: (region: string) => void
 }
 
 export function Header({
   searchQuery,
   onSearchChange,
-  onLoadData,
+  onLoadFrom1C,
+  onLoadExcel,
   onSaveData,
   hasChanges,
   isDataLoaded,
   isLoading,
+  dateFrom,
+  dateTo,
+  region,
+  onDateFromChange,
+  onDateToChange,
+  onRegionChange,
 }: HeaderProps) {
   return (
     <header className="border-b border-border bg-card sticky top-0 z-50">
@@ -41,6 +64,33 @@ export function Header({
           </div>
         </div>
 
+        <div className="flex items-center gap-2">
+          <Select value={region} onValueChange={onRegionChange}>
+            <SelectTrigger className="w-16 h-9 text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {REGIONS.map((r) => (
+                <SelectItem key={r} value={r} className="text-xs">
+                  {r}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Input
+            type="date"
+            value={dateFrom}
+            onChange={(e) => onDateFromChange(e.target.value)}
+            className="w-36 h-9 text-xs"
+          />
+          <Input
+            type="date"
+            value={dateTo}
+            onChange={(e) => onDateToChange(e.target.value)}
+            className="w-36 h-9 text-xs"
+          />
+        </div>
+
         <div className="flex-1 max-w-md">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -57,7 +107,7 @@ export function Header({
         <div className="flex items-center gap-3">
           <Button
             variant="outline"
-            onClick={onLoadData}
+            onClick={onLoadFrom1C}
             disabled={isLoading}
             className="gap-2"
           >
@@ -67,6 +117,15 @@ export function Header({
               <Database className="w-4 h-4" />
             )}
             Загрузить данные
+          </Button>
+          <Button
+            variant="outline"
+            onClick={onLoadExcel}
+            disabled={isLoading}
+            className="gap-2"
+          >
+            <FileSpreadsheet className="w-4 h-4" />
+            Excel
           </Button>
           <Button
             onClick={onSaveData}
