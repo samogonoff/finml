@@ -175,8 +175,43 @@ npm run dev
 
 ## WSL/Windows Development Notes
 
+### CRITICAL: How to Start the App from WSL (The Only Way That Works)
+
+The app MUST run from WSL because:
+- Python packages (pandas, torch, sentence-transformers) are installed in WSL's system Python
+- Windows venv (`D:\FinML\.venv\Scripts\python.exe`) does NOT work from WSL
+- Next.js must use WSL Python to call `predict_excel_api.py`
+
+**Correct startup procedure:**
+
+```bash
+# 1. Ensure Python dependencies are installed (one-time setup)
+pip3 install --break-system-packages -r /mnt/d/FinML/requirements.txt
+
+# 2. Install Node dependencies (one-time setup, or after package.json changes)
+cd /mnt/d/FinML/service && npm install && cd /mnt/d/FinML
+
+# 3. Start the Next.js server in background
+nohup npx next dev -H 172.31.20.1 -p 3000 > /tmp/next.log 2>&1 &
+
+# 4. Wait for server to be ready
+sleep 10
+
+# 5. Verify it's running
+curl -s -o /dev/null -w "%{http_code}" http://172.31.20.1:3000
+# Should return: 200
+```
+
+**Open in browser:** `http://172.31.20.1:3000` (NOT localhost)
+
+**Key fixes applied to the codebase:**
+- `service/app/api/upload/route.ts`: Uses `process.platform === 'win32' ? "D:\\FinML\\.venv\\Scripts\\python.exe" : "python3"` to select correct Python
+
+**To stop the server:**
+```bash
+pkill -f "next dev"
+```
+
+### Old Notes (for reference)
 - Node.js runs as Windows process (not WSL native)
-- Use `"/mnt/c/Program Files/nodejs/node.exe"` to invoke Node
-- Python venv: use `.venv` in project root
 - CUDA auto-detection: script checks `torch.cuda.is_available()`
-- **WSL curl cannot send POST requests to Windows Node.js processes** - use browser instead
