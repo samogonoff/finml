@@ -222,20 +222,21 @@ export function DataTable({
                       )
                     }
                     
-                    return (
-                      <TableCell
-                        key={col.key}
-                        className={cn(
-                          "text-xs",
-                          getColumnWidth(col.key),
-                          ["amount_doc", "amount_rub", "debit", "credit"].includes(col.key) && "text-right font-mono",
-                          ["info", "details"].includes(col.key) && "max-w-xs truncate",
-                          ["recipient"].includes(col.key) && "font-medium"
-                        )}
-                      >
-                        {String(value || "")}
-                      </TableCell>
-                    )
+                      return (
+                        <TableCell
+                          key={col.key}
+                          className={cn(
+                            "text-xs",
+                            getColumnWidth(col.key),
+                            ["amount_doc", "amount_rub", "debit", "credit"].includes(col.key) && "text-right font-mono",
+                            ["info", "details"].includes(col.key) && "max-w-xs truncate",
+                            ["recipient"].includes(col.key) && "font-medium"
+                          )}
+                          title={["info", "details"].includes(col.key) ? String(value || "") : undefined}
+                        >
+                          {String(value || "")}
+                        </TableCell>
+                      )
                   })}
               </TableRow>
             ))}
