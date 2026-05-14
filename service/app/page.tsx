@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, useRef } from "react"
+import { useState, useMemo, useRef, useCallback } from "react"
 import { Header } from "@/components/header"
 import { DataTable } from "@/components/data-table"
 import { StatsPanel } from "@/components/stats-panel"
@@ -52,21 +52,25 @@ export default function FinMLPage() {
   const [dateTo, setDateTo] = useState(todayStr)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  const [columnFilters, setColumnFilters] = useState<Record<string, string[]>>({})
+  const [sortConfig, setSortConfig] = useState<{ key: string; dir: "asc" | "desc" } | null>(null)
+
+  const handleColumnFilterChange = useCallback((key: string, values: string[]) => {
+    setColumnFilters(prev => {
+      const next = { ...prev }
+      if (values.length === 0) delete next[key]
+      else next[key] = values
+      return next
+    })
+  }, [])
+
+  const handleSortChange = useCallback((config: { key: string; dir: "asc" | "desc" } | null) => {
+    setSortConfig(config)
+  }, [])
+
   const hasChanges = useMemo(() => {
     return records.some((r) => r.isModified)
   }, [records])
-
-  const filteredRecords = useMemo(() => {
-    if (!searchQuery) return records
-    const query = searchQuery.toLowerCase()
-    return records.filter(
-      (r) =>
-        r.recipient.toLowerCase().includes(query) ||
-        r.info.toLowerCase().includes(query) ||
-        r.pl.toLowerCase().includes(query) ||
-        r.cfo.toLowerCase().includes(query)
-    )
-  }, [records, searchQuery])
 
   const handleLoadExcel = () => {
     fileInputRef.current?.click()
@@ -269,9 +273,14 @@ export default function FinMLPage() {
           <StatsPanel records={records} />
         )}
         <DataTable
-          records={filteredRecords}
+          records={records}
+          searchQuery={searchQuery}
+          columnFilters={columnFilters}
+          sortConfig={sortConfig}
           onPLChange={handlePLChange}
           onCFOChange={handleCFOChange}
+          onColumnFilterChange={handleColumnFilterChange}
+          onSortChange={handleSortChange}
           isDataLoaded={records.length > 0}
           isLoading={isLoading}
         />
