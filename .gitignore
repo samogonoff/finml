@@ -12,13 +12,13 @@ __pycache__/
 .venv/
 venv/
 ENV/
-*.pkl
-*.npy
 *.csv
 *.xlsx
 !Реестр*.xlsx
 
-# ML artifacts
+# ML artifacts (too large for git, download from Releases)
+*.pkl
+*.npy
 catboost_info/
 *.log
 
@@ -53,7 +53,3 @@ test*.js
 check*.py
 *.json
 !results*.json
-embeddings.npy
-*.npy
-*.pkl
-model_*.pkl

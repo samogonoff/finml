@@ -49,8 +49,8 @@ pip3 install --break-system-packages -r requirements.txt
 # 3. Установить Node.js зависимости
 cd service && npm install && cd ..
 
-# 4. Скачать model_final.pkl в корень проекта
-# (файл слишком большой для GitHub, скачайте отдельно)
+# 4. Скачать ML модели из GitHub Releases
+bash download_models.sh
 
 # 5. Запустить dev сервер
 nohup npx next dev -H 172.31.20.1 -p 3000 > /tmp/next.log 2>&1 &

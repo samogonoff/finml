@@ -136,9 +136,14 @@ Remote: https://github.com/samogonoff/finml.git
 
 ### Large Files (.gitignore)
 
-The following files are excluded from git (too large for GitHub):
+The following files are excluded from git (too large for GitHub) and downloaded from Releases:
 - `embeddings.npy` (102MB) - BERT embeddings
-- `*.pkl`, `model_*.pkl` - Python pickle files
+- `model_final.pkl` (22MB) - ML model bundle
+
+Download command:
+```bash
+bash download_models.sh
+```
 
 ### Setup on New Machine (Linux/WSL)
 
@@ -157,7 +162,7 @@ npm install
 cd ..
 
 # 3. Download large files separately
-# Download embeddings.npy and model_final.pkl and place in /mnt/d/FinML/
+bash download_models.sh
 
 # 4. Start the service
 cd service
@@ -182,7 +187,7 @@ npm install
 cd ..
 
 :: 3. Download large files separately
-:: Download embeddings.npy and model_final.pkl and place in D:\FinML\
+bash download_models.sh
 
 :: 4. Start the service
 cd service
